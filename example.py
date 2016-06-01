@@ -25,11 +25,12 @@ coarse_ys = list(np.linspace(ys[0], ys[-1], 8))
 points    = [coarse_xs, coarse_ys]
 points    = list(itertools.product(*points))
 
-from refine import refine_scalar_field, smallest_length, average_length
+from adapt.refine import refine_scalar_field, smallest_length, average_length
 
 for i in range(25):
 	values = np.apply_along_axis(ff, 1, points)
-	points = refine_scalar_field(points, values)
+	new_points = refine_scalar_field(points, values)
+	points = np.append(new_points, points, axis=0)
 
 print("Ended up with {} points in total.".format(len(points)))
 smallest = smallest_length(points)

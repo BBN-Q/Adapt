@@ -27,11 +27,13 @@ def average_length(points):
 		delta_rs[i] = la.norm(cdiff(mesh.points[simplex]), axis=1)
 	return np.mean(delta_rs)
 
-def refine_scalar_field(points, values):
-	# dimensions = len(data[0])-1
-	# points = data[:,0:dimensions]
-	# values = data[:,-1]
+def pv_from_dat(data):
+	dimensions = len(data[0])-1
+	points = data[:,0:dimensions]
+	values = data[:,dimensions:]
+	return points, values
 
+def refine_scalar_field(points, values):
 	mesh = Delaunay(points)
 
 	new_points = []
@@ -58,8 +60,8 @@ def refine_scalar_field(points, values):
 		b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
 		_, idx = np.unique(b, return_index=True)
 		unique_a = a[idx]
-		new_points = np.append(unique_a, mesh.points, axis=0)
+		# new_points = np.append(unique_a, axis=0)
 		print("{} new points added.".format(len(unique_a)))
-		return new_points
+		return unique_a
 	else:
 		raise Exception("Couldn't refine mesh.")
