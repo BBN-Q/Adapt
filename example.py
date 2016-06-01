@@ -29,8 +29,7 @@ from adapt.refine import refine_scalar_field, smallest_length, average_length
 
 for i in range(25):
 	values = np.apply_along_axis(ff, 1, points)
-	new_points = refine_scalar_field(points, values)
-	points = np.append(new_points, points, axis=0)
+	points = refine_scalar_field(points, values, all_points=True)
 
 print("Ended up with {} points in total.".format(len(points)))
 smallest = smallest_length(points)
