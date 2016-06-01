@@ -33,7 +33,7 @@ def pv_from_dat(data):
 	values = data[:,dimensions:]
 	return points, values
 
-def refine_scalar_field(points, values):
+def refine_scalar_field(points, values, all_points=False):
 	mesh = Delaunay(points)
 
 	new_points = []
@@ -60,8 +60,9 @@ def refine_scalar_field(points, values):
 		b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
 		_, idx = np.unique(b, return_index=True)
 		unique_a = a[idx]
-		# new_points = np.append(unique_a, axis=0)
 		print("{} new points added.".format(len(unique_a)))
+		if all_points:
+			return np.append(points, unique_a, axis=0)
 		return unique_a
 	else:
 		raise Exception("Couldn't refine mesh.")
