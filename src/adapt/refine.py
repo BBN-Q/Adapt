@@ -33,7 +33,8 @@ def pv_from_dat(data):
 	values = data[:,dimensions:]
 	return points, values
 
-def refine_scalar_field(points, values, all_points=False):
+def refine_scalar_field(points, values, all_points=False,
+						criterion="integral", threshold="one_sigma"):
 	mesh = Delaunay(points)
 
 	new_points = []
@@ -45,9 +46,27 @@ def refine_scalar_field(points, values, all_points=False):
 		delta_fs[i] = np.abs(delta_f)
 		delta_rs[i] = delta_r
 
-	delta_fs = delta_fs*delta_rs
-	deltas   = delta_fs/delta_fs.max()
-	deltas   = deltas > 0.5
+	if criterion == "integral":
+		delta_fs = delta_fs*delta_rs
+	elif criterion == "difference":
+		delta_fs = delta_fs
+	else:
+		raise ValueError("Invalid criterion specified. Must be one of integral, difference.")
+	
+	# Scale the errors
+	deltas = delta_fs/delta_fs.max()
+
+	if threshold == "mean":
+		deltas = deltas > np.mean(deltas)
+	elif threshold == "half":
+		deltas = deltas > 0.5
+	elif threshold == "one_sigma":
+		deltas = deltas > (np.mean(deltas) + np.std(deltas))
+	elif threshold == "two_sigma":
+		deltas = deltas > (np.mean(deltas) + 2*np.std(deltas))
+	else:
+		raise ValueError("Invalid threshold specified. Must be one of mean, half.")
+
 
 	for i, (d, simp) in enumerate(zip(deltas, mesh.simplices)):
 		half_delta_r = 0.5*cdiff(mesh.points[simp])
