@@ -9,7 +9,7 @@ def f(x, y, x0=0.8, y0=0.09, k=50.0):
 	xc = x0 / (y/y0 - 1) 
 	return lg(x, xc, k=k)
 def ff(v):
-	return f(*v, x0=0.8, y0=0.09, k=50) - f(*v, x0=3, y0=0.09, k=25.0) + np.random.random()*0.02
+	return f(*v, x0=0.8, y0=0.09, k=50) - f(*v, x0=3, y0=0.09, k=25.0) + np.random.random()*0.05
 
 xs = np.linspace(0, 1, 250)
 ys = np.linspace(0.1, 1, 250)
@@ -27,9 +27,9 @@ points    = list(itertools.product(*points))
 
 from adapt.refine import refine_scalar_field, smallest_length, average_length
 
-for i in range(25):
+for i in range(10):
 	values = np.apply_along_axis(ff, 1, points)
-	points = refine_scalar_field(points, values, all_points=True)
+	points = refine_scalar_field(points, values, all_points=True, threshold="one_sigma")
 
 print("Ended up with {} points in total.".format(len(points)))
 smallest = smallest_length(points)
