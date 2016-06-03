@@ -110,4 +110,4 @@ def refine_scalar_field(points, values, all_points=False,
 			return np.append(points, unique_a, axis=0)
 		return unique_a
 	else:
-		raise Exception("Couldn't refine mesh.")
+		return None

@@ -71,7 +71,7 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 	else:
 		raise ValueError("Invalid threshold specified. Must be one of mean, half.")
 
-	return filter_res and filter_noise and filter_thres
+	return filter_res*filter_noise*filter_thres
 
 def refine_scalar_field(points, values, all_points=False,
 						criterion="integral", threshold="one_sigma"):
