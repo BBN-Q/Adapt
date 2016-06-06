@@ -44,20 +44,22 @@ def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
 	return delta_f > threshold_value
 
-def filter_resolution(delta_r, resolution):
-	""" Return indices of points whose spacing is above the resolution """
-	return delta_r > resolution
-
 def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integral",
 				resolution = 0, noise_level = 0):
 	""" Filter points base on a combination of filters """
+
+	# Filter resolution
+	filter_res = filter_threshold(delta_rs, resolution)
+	# Filter noise
+	filter_noise = filter_threshold(delta_fs, noise_level)
+
 	if criterion == "integral":
 		credit = delta_fs*delta_rs
 	elif criterion == "difference":
 		credit = delta_fs
 	else:
 		raise ValueError("Invalid criterion specified. Must be one of integral, difference.")
-	
+
 	# Filter criterion
 	if threshold == "mean":
 		filter_thres = filter_threshold(credit, np.mean(credit))
@@ -70,12 +72,7 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 	else:
 		raise ValueError("Invalid threshold specified. Must be one of mean, half.")
 
-	# Filter resolution
-	filter_res = filter_resolution(delta_rs, resolution)
-	# Filter noise
-	filter_noise = filter_threshold(delta_fs, noise_level)
-
-	return filter_res*filter_noise*filter_thres
+	return filter_thres*filter_noise*filter_res
 
 def refine_scalar_field(points, values, all_points=False,
 						criterion="integral", threshold="one_sigma",

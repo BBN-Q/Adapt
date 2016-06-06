@@ -16,10 +16,10 @@ NUM_COARSE_Y = 20
 
 NOISE_LEVEL = 0.1
 
-ITERATION 	= 20
-AVERAGE_LENGTH = 5e-3  # maximum points = 1 / (AVERAGE_LENGTH)^2
-ACCEPT_NOISE = 0.05	# seem not necessary
-ACCEPT_RESOLUTION = 4e-3
+ITERATION 	= 15
+MAX_POINTS = 4e+4	# Maximum number of points to take
+ACCEPT_NOISE = 0.0	# seem not necessary
+ACCEPT_RESOLUTION = 2e-3
 
 def lg(x, xc, k=50.0):
 	return 1.0/(1.0 + np.exp(-k*(x-xc)))
@@ -52,16 +52,24 @@ for i in range(len(xx)):
 ax1.imshow(values_orig, origin='lower', extent=extent, aspect=aspect, interpolation='none')
 ax2.imshow(values_orig, origin='lower', extent=extent, aspect=aspect, interpolation='none')
 
+# Evaluate values at original mesh points
+values = np.apply_along_axis(ff, 1, points)
+
+# Find new points and update values
 for i in range(ITERATION):
-	values = np.apply_along_axis(ff, 1, points)
-	points = refine_scalar_field(points, values, all_points=True,
+	new_points = refine_scalar_field(points, values, all_points=False,
 								criterion="difference", threshold = "one_sigma",
 								resolution=ACCEPT_RESOLUTION, noise_level=ACCEPT_NOISE)
-	if points is None:
+	if new_points is None:
 		print("No more points can be added.")
 		break
-	if reach_average_length(points, AVERAGE_LENGTH):
-		print("Reach minimum average length!")
+	# Update points and values
+	points = np.append(points, new_points, axis=0)
+	new_values = np.apply_along_axis(ff, 1, new_points)
+	values = np.append(values, new_values, axis=0)
+
+	if len(points) > MAX_POINTS:
+		print("Reach maximum number of points! Stop.")
 		break
 
 print("Ended up with {} points in total.".format(len(points)))
