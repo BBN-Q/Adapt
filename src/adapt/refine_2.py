@@ -57,11 +57,7 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 		credit = delta_fs
 	else:
 		raise ValueError("Invalid criterion specified. Must be one of integral, difference.")
-
-	# Filter resolution
-	filter_res = filter_resolution(delta_rs, resolution)
-	# Filter noise
-	filter_noise = filter_threshold(delta_fs, noise_level)
+	
 	# Filter criterion
 	if threshold == "mean":
 		filter_thres = filter_threshold(credit, np.mean(credit))
@@ -73,6 +69,11 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 		filter_thres = filter_threshold(credit, np.mean(credit)+2*np.std(credit))
 	else:
 		raise ValueError("Invalid threshold specified. Must be one of mean, half.")
+
+	# Filter resolution
+	filter_res = filter_resolution(delta_rs, resolution)
+	# Filter noise
+	filter_noise = filter_threshold(delta_fs, noise_level)
 
 	return filter_res*filter_noise*filter_thres
 

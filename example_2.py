@@ -11,13 +11,15 @@ from adapt.refine_2 import refine_scalar_field, smallest_length, average_length,
 
 NUM_X 	= 250
 NUM_Y 	= 250
+NUM_COARSE_X = 20
+NUM_COARSE_Y = 20
 
 NOISE_LEVEL = 0.1
 
 ITERATION 	= 20
-AVERAGE_LENGTH = 0.4e-2
-ACCEPT_NOISE = 0.05
-ACCEPT_RESOLUTION = 2e-3
+AVERAGE_LENGTH = 5e-3  # maximum points = 1 / (AVERAGE_LENGTH)^2
+ACCEPT_NOISE = 0.05	# seem not necessary
+ACCEPT_RESOLUTION = 4e-3
 
 def lg(x, xc, k=50.0):
 	return 1.0/(1.0 + np.exp(-k*(x-xc)))
@@ -35,8 +37,8 @@ extent = (xs[0], xs[-1], ys[0], ys[-1])
 aspect = (xs[-1]-xs[0])/(ys[-1]-ys[0])
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16,8), sharey=True, sharex=True)
 
-coarse_xs = list(np.linspace(xs[0], xs[-1], 8))
-coarse_ys = list(np.linspace(ys[0], ys[-1], 8))
+coarse_xs = list(np.linspace(xs[0], xs[-1], NUM_COARSE_X))
+coarse_ys = list(np.linspace(ys[0], ys[-1], NUM_COARSE_Y))
 points    = [coarse_xs, coarse_ys]
 points    = list(itertools.product(*points))
 
@@ -47,12 +49,13 @@ for i in range(len(xx)):
 		values_orig[i,j] = ff((xx[i,j], yy[i,j]))
 
 # ax1 and ax2 be signal with noise
-ax1.imshow(values_orig, origin='lower', extent=extent, aspect=aspect)
-ax2.imshow(values_orig, origin='lower', extent=extent, aspect=aspect)
+ax1.imshow(values_orig, origin='lower', extent=extent, aspect=aspect, interpolation='none')
+ax2.imshow(values_orig, origin='lower', extent=extent, aspect=aspect, interpolation='none')
 
 for i in range(ITERATION):
 	values = np.apply_along_axis(ff, 1, points)
-	points = refine_scalar_field(points, values, all_points=True, threshold = "mean",
+	points = refine_scalar_field(points, values, all_points=True,
+								criterion="difference", threshold = "one_sigma",
 								resolution=ACCEPT_RESOLUTION, noise_level=ACCEPT_NOISE)
 	if points is None:
 		print("No more points can be added.")
