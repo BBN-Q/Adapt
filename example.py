@@ -1,7 +1,3 @@
-"""
-	example_2.py: minhhai messes around with the example
-"""
-
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import numpy as np

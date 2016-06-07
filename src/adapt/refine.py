@@ -1,6 +1,3 @@
-"""
-	minhhai messes around with the refining methods
-"""
 from scipy.spatial import Delaunay
 import numpy as np
 from numpy import linalg as la
@@ -44,7 +41,7 @@ def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
 	return delta_f > threshold_value
 
-def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integral",
+def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "difference",
 				resolution = 0, noise_level = 0):
 	""" Filter points base on a combination of filters """
 
@@ -58,7 +55,7 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 	elif criterion == "difference":
 		credit = delta_fs
 	else:
-		raise ValueError("Invalid criterion specified. Must be one of integral, difference.")
+		raise ValueError("Invalid criterion specified. Must be one of 'integral', 'difference'.")
 
 	# Filter criterion
 	if threshold == "mean":
@@ -70,12 +67,12 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 	elif threshold == "two_sigma":
 		filter_thres = filter_threshold(credit, np.mean(credit)+2*np.std(credit))
 	else:
-		raise ValueError("Invalid threshold specified. Must be one of mean, half.")
+		raise ValueError("Invalid threshold specified. Must be one of 'mean', 'half', 'one_sigma', 'two_sigma'.")
 
 	return filter_thres*filter_noise*filter_res
 
 def refine_scalar_field(points, values, all_points=False,
-						criterion="integral", threshold="one_sigma",
+						criterion="difference", threshold="one_sigma",
 						resolution=0, noise_level=0):
 	mesh = Delaunay(points)
 
