@@ -17,8 +17,7 @@ def generate_points(num, dim=2):
 	num: number of points in each dimension\
 	dim: number of dimensions
 	"""
-	dims = np.ones(dim)*num
-	nums = np.zeros(dims)
+	nums = np.zeros((num,dim))
 	for index,x in np.ndenumerate(nums):
 		nums[index] = np.random.random()
 	return nums
