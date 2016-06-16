@@ -12,7 +12,7 @@ NUM_COARSE_Y = 20
 
 NOISE_LEVEL = 0.1
 
-ITERATION 	= 15
+ITERATION 	= 6
 MAX_POINTS = 4e+4	# Maximum number of points to take
 ACCEPT_NOISE = 0.0	# seem not necessary
 ACCEPT_RESOLUTION = 2e-3
