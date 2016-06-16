@@ -74,6 +74,13 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "diffe
 def refine_scalar_field(points, values, all_points=False,
 						criterion="difference", threshold="one_sigma",
 						resolution=0, noise_level=0):
+
+	scale_factors = []
+	points = np.array(points)
+	for i in range(points.shape[1]):
+		scale_factors.append(1.0/np.mean(points[:,i]))
+		points[:,i] = points[:,i]*scale_factors[-1]
+
 	mesh = Delaunay(points)
 
 	new_points = []
@@ -103,6 +110,8 @@ def refine_scalar_field(points, values, all_points=False,
 		print("{} new points added.".format(len(unique_a)))
 		if all_points:
 			return np.append(points, unique_a, axis=0)
+		for i, sf in enumerate(scale_factors):
+			unique_a[:,i] = unique_a[:,i]/sf
 		return unique_a
 	else:
 		return None
