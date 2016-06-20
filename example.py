@@ -7,8 +7,8 @@ from adapt.refine import refine_scalar_field, smallest_length, average_length, r
 
 NUM_X 	= 250
 NUM_Y 	= 250
-NUM_COARSE_X = 20
-NUM_COARSE_Y = 20
+NUM_COARSE_X = 5
+NUM_COARSE_Y = 5
 
 NOISE_LEVEL = 0.1
 
@@ -20,7 +20,7 @@ ACCEPT_RESOLUTION = 2e-3
 def lg(x, xc, k=50.0):
 	return 1.0/(1.0 + np.exp(-k*(x-xc)))
 def f(x, y, x0=0.8, y0=0.09, k=50.0):
-	xc = x0 / (y/y0 - 1) 
+	xc = x0 / (y/y0 - 1)
 	return lg(x, xc, k=k)
 def ff(v):
 	return f(*v, x0=0.8, y0=0.09, k=50) - f(*v, x0=3, y0=0.09, k=25.0) + np.random.random()*NOISE_LEVEL
@@ -79,7 +79,7 @@ print("Approximate savings with respect to square grid at original feature size:
 
 mesh = Delaunay(points)
 ax2.triplot(mesh.points[:,0], mesh.points[:,1], mesh.simplices.copy(), 'w-')
-values = np.apply_along_axis(ff, 1, mesh.points) 
+values = np.apply_along_axis(ff, 1, mesh.points)
 ax3.tripcolor(mesh.points[:,0], mesh.points[:,1], mesh.simplices.copy(), values)
 ax4.tripcolor(mesh.points[:,0], mesh.points[:,1], mesh.simplices.copy(), values, shading='gouraud')
 plt.show()

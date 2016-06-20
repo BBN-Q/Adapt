@@ -4,7 +4,7 @@ from numpy import linalg as la
 import cProfile
 
 def cdiff(array):
-	return np.roll(array, -1, axis=0) - array 
+	return np.roll(array, -1, axis=0) - array
 
 def dir_derivs(simplex, mesh, values):
 	s_points  = mesh.points[simplex] # Points on the simplex
@@ -32,10 +32,6 @@ def pv_from_dat(data):
 	points = data[:,0:dimensions]
 	values = data[:,dimensions:]
 	return points, values
-
-def reach_average_length(points, avg_len):
-	""" Check if the average length of points is below the threshold """
-	return average_length(points) < avg_len
 
 def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
