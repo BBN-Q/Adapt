@@ -47,21 +47,23 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "diffe
 	filter_noise = filter_threshold(delta_fs, noise_level)
 
 	if criterion == "integral":
-		credit = delta_fs*delta_rs
+		metric = delta_fs*delta_rs
+	elif criterion == "integralsq":
+		metric = delta_fs*delta_rs*delta_rs
 	elif criterion == "difference":
-		credit = delta_fs
+		metric = delta_fs
 	else:
-		raise ValueError("Invalid criterion specified. Must be one of 'integral', 'difference'.")
+		raise ValueError("Invalid criterion specified. Must be one of 'integral', 'integralsq', difference'.")
 
 	# Filter criterion
 	if threshold == "mean":
-		filter_thres = filter_threshold(credit, np.mean(credit))
+		filter_thres = filter_threshold(metric, np.mean(metric))
 	elif threshold == "half":
-		filter_thres = filter_threshold(credit, 0.5*credit.max())
+		filter_thres = filter_threshold(metric, 0.5*metric.max())
 	elif threshold == "one_sigma":
-		filter_thres = filter_threshold(credit, np.mean(credit)+np.std(credit))
+		filter_thres = filter_threshold(metric, np.mean(metric)+np.std(metric))
 	elif threshold == "two_sigma":
-		filter_thres = filter_threshold(credit, np.mean(credit)+2*np.std(credit))
+		filter_thres = filter_threshold(metric, np.mean(metric)+2*np.std(metric))
 	else:
 		raise ValueError("Invalid threshold specified. Must be one of 'mean', 'half', 'one_sigma', 'two_sigma'.")
 
