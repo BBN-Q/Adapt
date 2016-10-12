@@ -35,7 +35,7 @@ def pv_from_dat(data):
 
 def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
-	return delta_f > threshold_value
+	return delta_f >= threshold_value
 
 def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "difference",
 				resolution = 0, noise_level = 0):
@@ -52,8 +52,12 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "diffe
 		metric = delta_fs*delta_rs*delta_rs
 	elif criterion == "difference":
 		metric = delta_fs
+	elif criterion == "spikes":
+		integrals = delta_fs*delta_rs
+		spread = np.std(integrals, axis=1)
+		metric = np.outer(spread, np.ones(len(integrals[0])))
 	else:
-		raise ValueError("Invalid criterion specified. Must be one of 'integral', 'integralsq', difference'.")
+		raise ValueError("Invalid criterion specified. Must be one of 'integral', 'integralsq', 'difference', 'spikes'.")
 
 	# Filter criterion
 	if threshold == "mean":
@@ -64,15 +68,14 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "diffe
 		filter_thres = filter_threshold(metric, np.mean(metric)+np.std(metric))
 	elif threshold == "two_sigma":
 		filter_thres = filter_threshold(metric, np.mean(metric)+2*np.std(metric))
+	elif threshold == "non_zero":
+		filter_thres = abs(metric) > 1e-10
 	else:
-		raise ValueError("Invalid threshold specified. Must be one of 'mean', 'half', 'one_sigma', 'two_sigma'.")
+		raise ValueError("Invalid threshold specified. Must be one of 'mean', 'half', 'one_sigma', 'two_sigma', 'non_zero")
 
 	return filter_thres*filter_noise*filter_res
 
-def refine_scalar_field(points, values, all_points=False,
-						criterion="difference", threshold="one_sigma",
-						resolution=0, noise_level=0):
-
+def well_scaled_delaunay_mesh(points):
 	scale_factors = []
 	points = np.array(points)
 	for i in range(points.shape[1]):
@@ -80,6 +83,13 @@ def refine_scalar_field(points, values, all_points=False,
 		points[:,i] = points[:,i]*scale_factors[-1]
 
 	mesh = Delaunay(points)
+	return mesh, scale_factors
+
+def refine_scalar_field(points, values, all_points=False,
+						criterion="difference", threshold="one_sigma",
+						resolution=0, noise_level=0):
+
+	mesh, scale_factors = well_scaled_delaunay_mesh(points)
 
 	new_points = []
 	delta_fs = np.zeros((len(mesh.simplices), len(mesh.simplices[0])))
@@ -88,7 +98,7 @@ def refine_scalar_field(points, values, all_points=False,
 	for i, simplex in enumerate(mesh.simplices):
 		delta_f, delta_r  = dir_derivs(simplex, mesh, values)
 		delta_fs[i] = np.abs(delta_f)
-		delta_rs[i] = delta_r
+		delta_rs[i] = np.abs(delta_r)
 
 	deltas = filter_grand(delta_rs, delta_fs, threshold = threshold, criterion = criterion,
 							resolution=resolution, noise_level=noise_level)
