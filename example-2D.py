@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 
-from adapt.refine import refine_scalar_field, smallest_length, average_length, reach_average_length
+from adapt.refine import refine_scalar_field, smallest_length, average_length#, reach_average_length
 
 NUM_X 	= 250
 NUM_Y 	= 250
