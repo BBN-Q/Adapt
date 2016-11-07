@@ -85,6 +85,31 @@ def well_scaled_delaunay_mesh(points):
 	mesh = Delaunay(points)
 	return mesh, scale_factors
 
+def refine_1D(points, values, all_points=False,
+			  criterion="difference", threshold="one_sigma",
+			  resolution=0, noise_level=0):
+
+	# Do not assume our data is sorted
+	sort_inds = np.argsort(points)
+	rs_sorted = points[sort_inds]
+	fs_sorted = values[sort_inds]
+	delta_rs  = np.diff(rs_sorted)
+	delta_fs  = np.diff(fs_sorted)
+
+	do_refine = filter_grand(delta_rs, delta_fs, threshold = threshold, criterion = criterion,
+							resolution=resolution, noise_level=noise_level)
+
+	new_points = rs_sorted[:-1] + 0.5*delta_rs
+	new_points = new_points[np.where(do_refine)]
+
+	if len(new_points) > 0:
+		print("{} new points added.".format(len(new_points)))
+		if all_points:
+			return np.append(points, new_points)
+		return new_points
+	else:
+		return None
+
 def refine_scalar_field(points, values, all_points=False,
 						criterion="difference", threshold="one_sigma",
 						resolution=0, noise_level=0):
