@@ -35,7 +35,7 @@ def pv_from_dat(data):
 
 def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
-	return delta_f >= threshold_value
+	return np.abs(delta_f) >= np.abs(threshold_value)
 
 def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "difference",
 				resolution = 0, noise_level = 0):
