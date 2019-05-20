@@ -37,7 +37,7 @@ def filter_threshold(delta_f, threshold_value):
 	""" Return indices of  the data whose values are above the acceptable level """
 	return delta_f >= threshold_value
 
-def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "difference",
+def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integral",
 				resolution = 0, noise_level = 0):
 	""" Filter points base on a combination of filters """
 
@@ -86,7 +86,7 @@ def well_scaled_delaunay_mesh(points):
 	return mesh, scale_factors
 
 def refine_1D(points, values, all_points=False,
-			  criterion="difference", threshold="one_sigma",
+			  criterion="integral", threshold="one_sigma",
 			  resolution=0, noise_level=0):
 
 	# Do not assume our data is sorted
@@ -103,7 +103,7 @@ def refine_1D(points, values, all_points=False,
 	new_points = new_points[np.where(do_refine)]
 
 	if len(new_points) > 0:
-		print("{} new points added.".format(len(new_points)))
+		# print("{} new points added.".format(len(new_points)))
 		if all_points:
 			return np.append(points, new_points)
 		return new_points
@@ -111,7 +111,7 @@ def refine_1D(points, values, all_points=False,
 		return None
 
 def refine_scalar_field(points, values, all_points=False,
-						criterion="difference", threshold="one_sigma",
+						criterion="integral", threshold="one_sigma",
 						resolution=0, noise_level=0):
 
 	mesh, scale_factors = well_scaled_delaunay_mesh(points)
@@ -140,7 +140,7 @@ def refine_scalar_field(points, values, all_points=False,
 		b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
 		_, idx = np.unique(b, return_index=True)
 		unique_a = a[idx]
-		print("{} new points added.".format(len(unique_a)))
+		# print("{} new points added.".format(len(unique_a)))
 		if all_points:
 			return np.append(points, unique_a, axis=0)
 		for i, sf in enumerate(scale_factors):
