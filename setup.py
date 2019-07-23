@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='adapt',
-    version='2019.1.1',
+    version='2019.1',
     author='Graham Rowlands',
     package_dir={'':'src'},
     packages=[
