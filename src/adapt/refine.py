@@ -76,14 +76,17 @@ def filter_grand(delta_rs, delta_fs, threshold = "one_sigma", criterion = "integ
 	return filter_thres*filter_noise*filter_res
 
 def well_scaled_delaunay_mesh(points):
-	scale_factors = []
-	points = np.array(points)
+	scales  = []
+	offsets = []
+	points  = np.array(points)
 	for i in range(points.shape[1]):
-		scale_factors.append(1.0/np.mean(points[:,i]))
-		points[:,i] = points[:,i]*scale_factors[-1]
+		offsets.append(points[:,i].min())
+		scales.append(1.0/(points[:,i].max()-points[:,i].min()))
+		points[:,i] -= offsets[-1]
+		points[:,i] *= scales[-1]
 
 	mesh = Delaunay(points)
-	return mesh, scale_factors
+	return mesh, scales, offsets
 
 def refine_1D(points, values, all_points=False,
 			  criterion="integral", threshold="one_sigma",
@@ -114,7 +117,7 @@ def refine_scalar_field(points, values, all_points=False,
 						criterion="integral", threshold="one_sigma",
 						resolution=0, noise_level=0):
 
-	mesh, scale_factors = well_scaled_delaunay_mesh(points)
+	mesh, scales, offsets = well_scaled_delaunay_mesh(points)
 
 	new_points = []
 	delta_fs = np.zeros((len(mesh.simplices), len(mesh.simplices[0])))
@@ -143,8 +146,8 @@ def refine_scalar_field(points, values, all_points=False,
 		# print("{} new points added.".format(len(unique_a)))
 		if all_points:
 			return np.append(points, unique_a, axis=0)
-		for i, sf in enumerate(scale_factors):
-			unique_a[:,i] = unique_a[:,i]/sf
+		for i, (sf, of) in enumerate(zip(scales,offsets)):
+			unique_a[:,i] = unique_a[:,i]/sf + of
 		return unique_a
 	else:
 		return None
