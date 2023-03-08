@@ -119,6 +119,7 @@ def refine_scalar_field(points, values, all_points=False,
 
 	mesh, scales, offsets = well_scaled_delaunay_mesh(points)
 
+	values = np.array(values)
 	new_points = []
 	delta_fs = np.zeros((len(mesh.simplices), len(mesh.simplices[0])))
 	delta_rs = np.zeros((len(mesh.simplices), len(mesh.simplices[0])))
