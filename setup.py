@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='adapt',
+    name='bbnadapt',
     version='2019.1',
     author='Graham Rowlands',
     package_dir={'':'src'},
@@ -28,6 +28,8 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering",
     ],
     keywords="adaptive refinement "
